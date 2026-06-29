@@ -1,3 +1,9 @@
+"""Top-level CLI entrypoint for the Aha command-line application.
+
+This module defines the root Click command group and registers all domain
+subcommands that make up the public CLI surface.
+"""
+
 import click
 from aha.commands.catalog.main import catalog
 from aha.commands.helm.main import helm
@@ -9,10 +15,18 @@ from aha.commands.helpers.main import helpers
 @click.group()
 @click.pass_context
 def cli(ctx):
-    """AHA CLI helps you manage your HELM Chart templates by using profiles."""
+    """Aha root CLI group.
+
+    This is the command hub that delegates to subcommand groups for catalog,
+    templates, profiles, helm, and helpers workflows.
+
+    Args:
+        ctx: Click invocation context for the current command execution.
+    """
     pass
 
 
+# Register command groups on the root CLI.
 cli.add_command(catalog)
 cli.add_command(templates)
 cli.add_command(profiles)
@@ -21,4 +35,5 @@ cli.add_command(helpers)
 
 
 if __name__ == "__main__":
+    # Allow module execution via: python -m aha.main
     cli()

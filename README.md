@@ -59,3 +59,19 @@ case $? in
   2) echo "configuration/input failure" ; exit 2 ;;
 esac
 ```
+
+### Testing Console Output
+
+When testing command output, configure the shared console before first use and reset it between tests when needed:
+
+```python
+from aha.ui.console import configure_console, get_console, reset_console
+
+reset_console()
+configure_console(record=True, force_terminal=False)
+
+console = get_console()
+console.print("hello")
+assert "hello" in console.export_text()
+```
+
