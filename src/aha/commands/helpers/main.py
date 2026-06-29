@@ -1,3 +1,15 @@
+"""Helpers command group for the Aha CLI.
+
+This module provides helper-oriented catalog commands:
+
+- `aha helpers list`: list helper files available in the configured catalog.
+- `aha helpers get <helper>`: display helper file content with syntax highlighting.
+
+The command group enforces the same catalog-initialisation and exit-code behavior
+used across the CLI:
+- exits with code `2` for catalog/config/data precondition failures.
+"""
+
 import click
 from rich.syntax import Syntax
 from rich.table import Table
@@ -13,16 +25,27 @@ from aha.ui.console import console
 
 
 def _print_catalog_not_initialised() -> None:
+    """Print a themed guidance message when catalog setup is missing."""
     console.print("[warning]Aha catalog is not initialised.[/warning]")
     console.print("Run: [highlight]aha catalog init --repo <repo-url>[/highlight]")
 
 
 def _exit_catalog_not_initialised() -> NoReturn:
+    """Print missing-catalog guidance and terminate with exit code 2."""
     _print_catalog_not_initialised()
     raise click.exceptions.Exit(2)
 
 
 def _list_helpers_or_exit() -> list[str]:
+    """Return helper file names, or exit with code 2 when catalog is unavailable.
+
+    Returns:
+        list[str]: Sorted helper file names discovered in the catalog helpers folder.
+
+    Raises:
+        click.exceptions.Exit: Always raised with code `2` if catalog is not
+            initialised/valid.
+    """
     try:
         return list_helpers()
     except AhaCatalogNotInitialisedException:
@@ -32,14 +55,14 @@ def _list_helpers_or_exit() -> list[str]:
 @click.group()
 @click.pass_context
 def helpers(ctx):
-    """Manage helpers"""
+    """Manage helper files from the configured catalog."""
     pass
 
 
 @helpers.command(name="list")
 @click.pass_context
 def list_registered_helpers(ctx):
-    """List all helpers currently in the system."""
+    """List all helper files currently available in the catalog."""
     helpers_list = _list_helpers_or_exit()
 
     if not helpers_list:
@@ -60,6 +83,17 @@ def list_registered_helpers(ctx):
 @click.pass_context
 @click.argument("helper")
 def get(ctx, helper: str):
+    """Fetch and display a helper file by name.
+
+    Args:
+        helper: Helper file name (with or without suffix, depending on catalog
+            resolution rules).
+
+    Failure behavior:
+        - Exits `2` when catalog is not initialised.
+        - Exits `2` when helper data validation/loading fails (e.g., missing file
+          or invalid file type), after printing a themed error.
+    """
     try:
         helper_str: str = get_helper_data(helper)
     except AhaCatalogNotInitialisedException:
@@ -67,5 +101,6 @@ def get(ctx, helper: str):
     except AhaCatalogDataException as exc:
         console.print(f"[error]{exc}[/error]")
         raise click.exceptions.Exit(2)
+
     syntax = Syntax(helper_str, "yaml+jinja", theme="nord-darker", line_numbers=True)
     console.print(syntax)
