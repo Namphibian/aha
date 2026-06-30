@@ -12,9 +12,11 @@ It exposes two kinds of APIs:
 from __future__ import annotations
 
 import configparser
+import json
 from pathlib import Path
-from typing import Any
+from typing import Any, NoReturn
 
+import click
 import yaml
 
 from aha.library.constants import (
@@ -24,6 +26,7 @@ from aha.library.constants import (
     PROFILE_SUFFIXES,
     REMOVE_INIT_PY,
     TEMPLATE_SUFFIXES,
+    VALUES_SUFFIXES,
 )
 
 
@@ -238,11 +241,15 @@ def list_templates() -> list[str]:
     return _list_catalog_files("templates", TEMPLATE_SUFFIXES)
 
 
+def list_values() -> list[str]:
+    return _list_catalog_files("values", VALUES_SUFFIXES)
+
+
 def list_helpers() -> list[str]:
     return _list_catalog_files("helpers", HELPER_SUFFIXES)
 
 
-def get_profile_data(profile_name: str) -> tuple[str, Any]:
+def get_profile_data(profile_name: str) -> tuple[str, dict]:
     profile_path = _catalog_file_path(
         directory="profiles",
         name=profile_name,
@@ -264,7 +271,7 @@ def get_profile_data(profile_name: str) -> tuple[str, Any]:
     return yaml_str, yaml.safe_load(yaml_str)
 
 
-def get_template_data(template_name: str) -> Any:
+def get_template_data(template_name: str) -> str:
     template_path = _catalog_file_path(
         directory="templates",
         name=template_name,
@@ -282,8 +289,30 @@ def get_template_data(template_name: str) -> Any:
             f"Template '{template_name}' was not found."
         )
 
-    yaml_str: str = template_path.read_text(encoding="utf-8")
-    return yaml_str
+    data_str: str = template_path.read_text(encoding="utf-8")
+    return data_str
+
+
+def get_values_data(template_name: str) -> tuple[str, Any]:
+    template_path = _catalog_file_path(
+        directory="values",
+        name=template_name,
+        allowed_suffixes=VALUES_SUFFIXES,
+        default_suffix=".json",
+    )
+
+    if template_path.suffix.lower() not in VALUES_SUFFIXES:
+        raise AhaCatalogInvalidFileTypeException(
+            f"Template '{template_name}' must be a YAML or TPL file."
+        )
+
+    if not template_path.is_file():
+        raise AhaCatalogFileNotFoundException(
+            f"Template '{template_name}' was not found."
+        )
+
+    data_str: str = template_path.read_text(encoding="utf-8")
+    return data_str, json.loads(data_str)
 
 
 def get_helper_data(helper_name: str) -> Any:

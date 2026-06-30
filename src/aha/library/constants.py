@@ -8,3 +8,4 @@ REMOVE_INIT_PY: str = "__init__.py"
 PROFILE_SUFFIXES: set[str] = {".yaml", ".yml"}
 TEMPLATE_SUFFIXES: set[str] = {".yaml", ".yml"}
 HELPER_SUFFIXES: set[str] = {".tpl"}
+VALUES_SUFFIXES: set[str] = {".json"}

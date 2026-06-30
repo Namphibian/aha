@@ -10,6 +10,7 @@ from aha.commands.helm.main import helm
 from aha.commands.profiles.main import profiles
 from aha.commands.templates.main import templates
 from aha.commands.helpers.main import helpers
+from aha.commands.values.main import values
 
 
 @click.group()
@@ -32,6 +33,7 @@ cli.add_command(templates)
 cli.add_command(profiles)
 cli.add_command(helm)
 cli.add_command(helpers)
+cli.add_command(values)
 
 
 if __name__ == "__main__":

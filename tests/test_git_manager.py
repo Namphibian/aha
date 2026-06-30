@@ -82,6 +82,3 @@ class GitManagerBehavior(unittest.TestCase):
             self.assertEqual(init_result.returncode, 0)
 
             self.assertTrue(is_git_repository(bare_repo_path))
-
-
-

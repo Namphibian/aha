@@ -13,7 +13,6 @@ used across the CLI:
 import click
 from rich.syntax import Syntax
 from rich.table import Table
-from typing import NoReturn
 
 from aha.library.catalog.manager import (
     AhaCatalogDataException,
@@ -22,18 +21,7 @@ from aha.library.catalog.manager import (
     list_helpers,
 )
 from aha.ui.console import console
-
-
-def _print_catalog_not_initialised() -> None:
-    """Print a themed guidance message when catalog setup is missing."""
-    console.print("[warning]Aha catalog is not initialised.[/warning]")
-    console.print("Run: [highlight]aha catalog init --repo <repo-url>[/highlight]")
-
-
-def _exit_catalog_not_initialised() -> NoReturn:
-    """Print missing-catalog guidance and terminate with exit code 2."""
-    _print_catalog_not_initialised()
-    raise click.exceptions.Exit(2)
+from aha.ui.console_exception_helper import exit_catalog_not_initialised
 
 
 def _list_helpers_or_exit() -> list[str]:
@@ -49,7 +37,7 @@ def _list_helpers_or_exit() -> list[str]:
     try:
         return list_helpers()
     except AhaCatalogNotInitialisedException:
-        _exit_catalog_not_initialised()
+        exit_catalog_not_initialised()
 
 
 @click.group()
@@ -97,7 +85,7 @@ def get(ctx, helper: str):
     try:
         helper_str: str = get_helper_data(helper)
     except AhaCatalogNotInitialisedException:
-        _exit_catalog_not_initialised()
+        exit_catalog_not_initialised()
     except AhaCatalogDataException as exc:
         console.print(f"[error]{exc}[/error]")
         raise click.exceptions.Exit(2)

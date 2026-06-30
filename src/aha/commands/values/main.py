@@ -5,57 +5,57 @@ from rich.table import Table
 from aha.library.catalog.manager import (
     AhaCatalogDataException,
     AhaCatalogNotInitialisedException,
-    get_template_data,
-    list_templates,
+    list_values,
+    get_values_data,
 )
 from aha.ui.console import console
 from aha.ui.console_exception_helper import exit_catalog_not_initialised
 
 
-def _list_templates_or_exit() -> list[str]:
+def _list_values_or_exit() -> list[str]:
     try:
-        return list_templates()
+        return list_values()
     except AhaCatalogNotInitialisedException:
         exit_catalog_not_initialised()
 
 
 @click.group()
 @click.pass_context
-def templates(ctx):
-    """Manage templates"""
+def values(ctx):
+    """Manage values"""
     pass
 
 
-@templates.command(name="list")
+@values.command(name="list")
 @click.pass_context
-def list_registered_templates(ctx):
-    """List all the templates_list currently in the system."""
-    templates_list = _list_templates_or_exit()
+def list_registered_values(ctx):
+    """List all the values schemas currently in the system."""
+    values_list = _list_values_or_exit()
 
-    if not templates_list:
-        console.print("[warning]No templates_list found.[/warning]")
+    if not values_list:
+        console.print("[warning]No values_list found.[/warning]")
         return
 
-    table = Table(title="Registered Templates")
+    table = Table(title="Registered values")
     table.add_column("#", justify="right", style="subtle", no_wrap=True)
     table.add_column("Template", style="value")
 
-    for index, profile in enumerate(templates_list, start=1):
+    for index, profile in enumerate(values_list, start=1):
         table.add_row(str(index), profile)
 
     console.print(table)
 
 
-@templates.command(name="get")
+@values.command(name="get")
 @click.pass_context
-@click.argument("template")
-def get(ctx, template: str):
+@click.argument("values")
+def get(ctx, values: str):
     try:
-        template_str = get_template_data(template)
+        values_str, _ = get_values_data(values)
     except AhaCatalogNotInitialisedException:
         exit_catalog_not_initialised()
     except AhaCatalogDataException as exc:
         console.print(f"[error]{exc}[/error]")
         raise click.exceptions.Exit(2)
-    syntax = Syntax(template_str, "yaml+jinja", theme="nord-darker", line_numbers=True)
+    syntax = Syntax(values_str, "json", theme="nord-darker", line_numbers=True)
     console.print(syntax)

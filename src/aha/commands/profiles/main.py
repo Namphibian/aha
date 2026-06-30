@@ -1,7 +1,6 @@
 import click
 from rich.syntax import Syntax
 from rich.table import Table
-from typing import NoReturn
 
 from aha.library.catalog.manager import (
     AhaCatalogDataException,
@@ -10,16 +9,7 @@ from aha.library.catalog.manager import (
     list_profiles,
 )
 from aha.ui.console import console
-
-
-def _print_catalog_not_initialised() -> None:
-    console.print("[warning]Aha catalog is not initialised.[/warning]")
-    console.print("Run: [highlight]aha catalog init --repo <repo-url>[/highlight]")
-
-
-def _exit_catalog_not_initialised() -> NoReturn:
-    _print_catalog_not_initialised()
-    raise click.exceptions.Exit(2)
+from aha.ui.console_exception_helper import exit_catalog_not_initialised
 
 
 @click.group()
@@ -47,11 +37,11 @@ def delete(ctx):
 @click.argument("profile")
 def get(ctx, profile: str):
     """Get and displays profile record details"""
-    profile_str = ""
+
     try:
         profile_str, _ = get_profile_data(profile)
     except AhaCatalogNotInitialisedException:
-        _exit_catalog_not_initialised()
+        exit_catalog_not_initialised()
     except AhaCatalogDataException as exc:
         console.print(f"[error]{exc}[/error]")
         raise click.exceptions.Exit(2)
@@ -67,19 +57,16 @@ def list_registered_profiles(ctx):
     profiles_listed: list[str] = []
     try:
         profiles_listed = list_profiles()
-    except AhaCatalogNotInitialisedException:
-        _exit_catalog_not_initialised()
 
-    profile_data_map = {}
-    if not profiles_listed:
-        console.print("[warning]No profiles found.[/warning]")
-        return
+        profile_data_map = {}
+        if not profiles_listed:
+            console.print("[warning]No profiles found.[/warning]")
+            return
 
-    try:
         for profile in profiles_listed:
             _, profile_data_map[profile] = get_profile_data(profile)
     except AhaCatalogNotInitialisedException:
-        _exit_catalog_not_initialised()
+        exit_catalog_not_initialised()
     except AhaCatalogDataException as exc:
         console.print(f"[error]{exc}[/error]")
         raise click.exceptions.Exit(2)
