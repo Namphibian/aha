@@ -264,5 +264,3 @@ def _extract_defaults_from_schema(schema: Any) -> Any:
         return [item_default]
 
     return None
-
-

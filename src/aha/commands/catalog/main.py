@@ -22,7 +22,11 @@ from aha.ui.console import console
 @click.group()
 @click.pass_context
 def catalog(ctx):
-    """Manage the external templates and profiles catalog."""
+    """Manage the external templates and profiles catalog.
+
+    This command group provides lifecycle operations for a user-configured
+    Git-backed catalog directory used by the CLI.
+    """
     pass
 
 
@@ -57,7 +61,14 @@ def catalog(ctx):
     help="Overwrite catalog config if a catalog is already configured.",
 )
 def init(ctx, repo: str, catalog_path: Path, branch: str, force: bool):
-    """Initialize the external catalog from a Git repository."""
+    """Initialize catalog configuration and clone/setup repository.
+
+    Behavior:
+    - If a catalog is already configured and `--force` is not set, exits with code 2.
+    - If target path exists and is a Git repo, skips clone and only writes config.
+    - If target path is empty/non-existent, clones the requested repo/branch.
+    - Warns (non-fatal) if `catalog.yaml` is missing.
+    """
     existing_catalog_path = get_catalog_path()
 
     if existing_catalog_path and existing_catalog_path.exists() and not force:
@@ -116,7 +127,12 @@ def init(ctx, repo: str, catalog_path: Path, branch: str, force: bool):
 @catalog.command(name="update")
 @click.pass_context
 def update(ctx):
-    """Pull the latest catalog changes from Git."""
+    """Pull latest changes for the configured catalog repository.
+
+    Exits with:
+    - `2` when catalog is not initialised/invalid or not a Git repo.
+    - `1` when the Git pull operation fails.
+    """
     try:
         catalog_path = require_catalog_root()
     except AhaCatalogNotInitialisedException:
@@ -150,7 +166,11 @@ def update(ctx):
 @catalog.command(name="status")
 @click.pass_context
 def status(ctx):
-    """Show the current catalog configuration and Git status."""
+    """Display catalog configuration and current Git working status.
+
+    Shows a summary table first, then appends `git status --short --branch`
+    output when available.
+    """
     try:
         catalog_path = require_catalog_root()
     except AhaCatalogNotInitialisedException:
@@ -201,7 +221,10 @@ def status(ctx):
 @catalog.command(name="path")
 @click.pass_context
 def path(ctx):
-    """Print the local catalog path."""
+    """Print resolved local catalog root path.
+
+    Requires catalog to be initialised and path to exist as a directory.
+    """
     try:
         catalog_path = require_catalog_root()
     except AhaCatalogNotInitialisedException:
