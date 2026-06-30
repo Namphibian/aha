@@ -3,10 +3,12 @@ from rich.syntax import Syntax
 from rich.table import Table
 
 from aha.library.catalog.manager import (
-    AhaCatalogDataException,
-    AhaCatalogNotInitialisedException,
     get_template_data,
     list_templates,
+)
+from aha.library.catalog.exceptions import (
+    AhaCatalogNotInitialisedException,
+    AhaCatalogDataException,
 )
 from aha.ui.console import console
 from aha.ui.console_exception_helper import exit_catalog_not_initialised

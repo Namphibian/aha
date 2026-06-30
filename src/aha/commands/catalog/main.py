@@ -6,7 +6,6 @@ import click
 from rich.table import Table
 
 from aha.library.catalog.manager import (
-    AhaCatalogNotInitialisedException,
     get_catalog_branch,
     get_catalog_path,
     get_catalog_repo,
@@ -14,6 +13,7 @@ from aha.library.catalog.manager import (
     catalog_manifest_exists,
     save_catalog_config,
 )
+from aha.library.catalog.exceptions import AhaCatalogNotInitialisedException
 from aha.library.constants import AHA_CONFIG_FILE, DEFAULT_CATALOG_DIR
 from aha.library.git.manager import run_git_command, is_git_repository
 from aha.ui.console import console

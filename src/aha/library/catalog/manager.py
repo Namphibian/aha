@@ -14,11 +14,15 @@ from __future__ import annotations
 import configparser
 import json
 from pathlib import Path
-from typing import Any, NoReturn
+from typing import Any
 
-import click
 import yaml
 
+from aha.library.catalog.exceptions import (
+    AhaCatalogNotInitialisedException,
+    AhaCatalogInvalidFileTypeException,
+    AhaCatalogFileNotFoundException,
+)
 from aha.library.constants import (
     AHA_CONFIG_DIR,
     AHA_CONFIG_FILE,
@@ -28,26 +32,6 @@ from aha.library.constants import (
     TEMPLATE_SUFFIXES,
     VALUES_SUFFIXES,
 )
-
-
-class AhaCatalogNotInitialisedException(RuntimeError):
-    """Raised when catalog operations are requested before setup is valid.
-
-    This is used by callers that require a usable catalog root directory and
-    cannot continue safely when the catalog config is missing or invalid.
-    """
-
-
-class AhaCatalogDataException(RuntimeError):
-    """Raised for catalog data access and validation errors."""
-
-
-class AhaCatalogInvalidFileTypeException(AhaCatalogDataException):
-    """Raised when a requested catalog file name has an invalid suffix."""
-
-
-class AhaCatalogFileNotFoundException(AhaCatalogDataException):
-    """Raised when a requested catalog file is not found."""
 
 
 def load_config() -> configparser.ConfigParser:

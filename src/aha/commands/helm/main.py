@@ -4,9 +4,9 @@ from typing import Any
 
 import yaml
 
-from aha.library.catalog.manager import (
-    AhaCatalogDataException,
+from aha.library.catalog.exceptions import (
     AhaCatalogNotInitialisedException,
+    AhaCatalogDataException,
 )
 from aha.library.catalog.manager import (
     get_helper_data,
