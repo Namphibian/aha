@@ -10,6 +10,7 @@ from aha.library.catalog.exceptions import (
     AhaCatalogNotInitialisedException,
     AhaCatalogDataException,
 )
+from aha.library.constants import TEMPLATE_KEY
 from aha.ui.console import console
 from aha.ui.console_exception_helper import exit_catalog_not_initialised
 
@@ -84,8 +85,8 @@ def list_registered_profiles(ctx):
         table.add_row(
             v["name"],
             v["description"],
-            str(len(v["resources"]["mandatory"])),
-            str(len(v["resources"]["optional"])),
+            str(len(v[TEMPLATE_KEY]["mandatory"])),
+            str(len(v[TEMPLATE_KEY]["optional"])),
             k,
         )
     console.print(table)

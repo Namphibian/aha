@@ -9,3 +9,8 @@ PROFILE_SUFFIXES: set[str] = {".yaml", ".yml"}
 TEMPLATE_SUFFIXES: set[str] = {".yaml", ".yml"}
 HELPER_SUFFIXES: set[str] = {".tpl"}
 VALUES_SUFFIXES: set[str] = {".json"}
+
+TEMPLATE_KEY = "templates"
+PROFILE_KEY = "profiles"
+VALUES_KEY = "values"
+HELPERS_KEY = "helpers"

@@ -14,6 +14,11 @@ from aha.library.catalog.manager import (
     get_template_data,
     get_values_data,
 )
+from aha.library.constants import (
+    TEMPLATE_KEY,
+    HELPERS_KEY,
+    VALUES_KEY,
+)
 from aha.ui.console import console
 from aha.ui.console_exception_helper import exit_catalog_not_initialised
 
@@ -60,7 +65,7 @@ def chart(ctx, name: str, profile: str, output_path: Path):
         console.print(
             f"[success]Generated[/success] all helpers to [path]{templates_dir}[/path]"
         )
-        values_schema_name: Any = profile_data.get("values")
+        values_schema_name: Any = profile_data.get(VALUES_KEY)
         if not isinstance(values_schema_name, str):
             console.print("[error]Profile 'values' must be a schema file name.[/error]")
             raise click.exceptions.Exit(2)
@@ -98,7 +103,7 @@ def prepare_new_helm_chart_folder(output_path: Path):
 
 
 def write_profile_helpers_to_chart(profile_data, templates_dir: Path):
-    helper_names: Any = profile_data.get("helpers", [])
+    helper_names: Any = profile_data.get(HELPERS_KEY, [])
     if not isinstance(helper_names, list):
         console.print("[error]Profile 'helpers' must be a list.[/error]")
         raise click.exceptions.Exit(2)
@@ -117,10 +122,10 @@ def write_profile_helpers_to_chart(profile_data, templates_dir: Path):
 
 
 def write_profile_templates_to_chart(output_path: Path, profile_data) -> Path:
-    templates_dir = output_path / "templates"
+    templates_dir = output_path / TEMPLATE_KEY
     templates_dir.mkdir(parents=True, exist_ok=True)
 
-    templates_data: Any = profile_data.get("templates", {})
+    templates_data: Any = profile_data.get(TEMPLATE_KEY, {})
     if not isinstance(templates_data, dict):
         console.print("[error]Profile 'templates' must be an object.[/error]")
         raise click.exceptions.Exit(2)
@@ -172,7 +177,7 @@ def write_profile_chart_yaml_file(name: str, output_path: Path, profile_data) ->
 
 
 def write_profile_values_yaml_file(output_path: Path, values_schema_name: str) -> Path:
-    _, values_schema = get_values_data(values_schema_name)
+    values_schema_str, values_schema = get_values_data(values_schema_name)
 
     if not isinstance(values_schema, dict):
         console.print("[error]Values schema must be a JSON object.[/error]")
@@ -183,13 +188,18 @@ def write_profile_values_yaml_file(output_path: Path, values_schema_name: str) -
         values_payload = {}
 
     values_file = output_path / "values.yaml"
+    values_schema_file = output_path / "values.schema.json"
     try:
+        values_schema_file.write_text(values_schema_str, encoding="utf-8")
+
         values_file.write_text(
             yaml.safe_dump(values_payload, sort_keys=False),
             encoding="utf-8",
         )
     except OSError as exc:
-        console.print(f"[error]Failed to write {values_file}: {exc}[/error]")
+        console.print(
+            f"[error]Failed to write values files in {output_path}: {exc}[/error]"
+        )
         raise click.exceptions.Exit(1)
 
     return values_file
@@ -205,7 +215,7 @@ def write_profile_notes_file(output_path: Path, profile_data) -> Path | None:
         console.print("[error]Profile 'notes' must be a string.[/error]")
         raise click.exceptions.Exit(2)
 
-    notes_file = output_path / "templates" / "NOTES.txt"
+    notes_file = output_path / TEMPLATE_KEY / "NOTES.txt"
     try:
         notes_file.write_text(notes, encoding="utf-8")
     except OSError as exc:

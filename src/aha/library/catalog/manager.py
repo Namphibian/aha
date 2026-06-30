@@ -31,6 +31,10 @@ from aha.library.constants import (
     REMOVE_INIT_PY,
     TEMPLATE_SUFFIXES,
     VALUES_SUFFIXES,
+    TEMPLATE_KEY,
+    PROFILE_KEY,
+    HELPERS_KEY,
+    VALUES_KEY,
 )
 
 
@@ -218,24 +222,24 @@ def _catalog_file_path(
 
 
 def list_profiles() -> list[str]:
-    return _list_catalog_files("profiles", PROFILE_SUFFIXES)
+    return _list_catalog_files(PROFILE_KEY, PROFILE_SUFFIXES)
 
 
 def list_templates() -> list[str]:
-    return _list_catalog_files("templates", TEMPLATE_SUFFIXES)
+    return _list_catalog_files(TEMPLATE_KEY, TEMPLATE_SUFFIXES)
 
 
 def list_values() -> list[str]:
-    return _list_catalog_files("values", VALUES_SUFFIXES)
+    return _list_catalog_files(VALUES_KEY, VALUES_SUFFIXES)
 
 
 def list_helpers() -> list[str]:
-    return _list_catalog_files("helpers", HELPER_SUFFIXES)
+    return _list_catalog_files(HELPERS_KEY, HELPER_SUFFIXES)
 
 
 def get_profile_data(profile_name: str) -> tuple[str, dict]:
     profile_path = _catalog_file_path(
-        directory="profiles",
+        directory=PROFILE_KEY,
         name=profile_name,
         allowed_suffixes=PROFILE_SUFFIXES,
         default_suffix=".yaml",
@@ -257,7 +261,7 @@ def get_profile_data(profile_name: str) -> tuple[str, dict]:
 
 def get_template_data(template_name: str) -> str:
     template_path = _catalog_file_path(
-        directory="templates",
+        directory=TEMPLATE_KEY,
         name=template_name,
         allowed_suffixes=TEMPLATE_SUFFIXES,
         default_suffix=".yaml",
@@ -279,7 +283,7 @@ def get_template_data(template_name: str) -> str:
 
 def get_values_data(template_name: str) -> tuple[str, Any]:
     template_path = _catalog_file_path(
-        directory="values",
+        directory=VALUES_KEY,
         name=template_name,
         allowed_suffixes=VALUES_SUFFIXES,
         default_suffix=".json",
@@ -301,7 +305,7 @@ def get_values_data(template_name: str) -> tuple[str, Any]:
 
 def get_helper_data(helper_name: str) -> Any:
     helper_path = _catalog_file_path(
-        directory="helpers",
+        directory=HELPERS_KEY,
         name=helper_name,
         allowed_suffixes=HELPER_SUFFIXES,
         default_suffix=".tpl",
