@@ -7,36 +7,36 @@ from aha.library.git.manager import is_git_repository, run_git_command
 
 
 class GitManagerBehavior(unittest.TestCase):
-    def run_git_command_returns_completed_process_for_valid_git_command(self):
+    def test_run_git_command_returns_completed_process_for_valid_git_command(self):
         result = run_git_command(["--version"])
 
         self.assertEqual(result.returncode, 0)
         self.assertIn("git version", result.stdout.lower())
 
-    def run_git_command_captures_non_zero_exit_for_invalid_git_command(self):
+    def test_run_git_command_captures_non_zero_exit_for_invalid_git_command(self):
         result = run_git_command(["definitely-not-a-real-git-flag"])
 
         self.assertNotEqual(result.returncode, 0)
         self.assertIsInstance(result.stderr, str)
         self.assertNotEqual(result.stderr.strip(), "")
 
-    def is_git_repository_returns_false_for_missing_path(self):
+    def test_is_git_repository_returns_false_for_missing_path(self):
         missing_path = Path(tempfile.gettempdir()) / "aha-missing-git-repo-path"
 
         self.assertFalse(is_git_repository(missing_path))
 
-    def is_git_repository_returns_false_for_regular_file_path(self):
+    def test_is_git_repository_returns_false_for_regular_file_path(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             file_path = Path(tmpdir) / "not-a-directory.txt"
             file_path.write_text("content", encoding="utf-8")
 
             self.assertFalse(is_git_repository(file_path))
 
-    def is_git_repository_returns_false_for_directory_that_is_not_a_repo(self):
+    def test_is_git_repository_returns_false_for_directory_that_is_not_a_repo(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             self.assertFalse(is_git_repository(Path(tmpdir)))
 
-    def is_git_repository_returns_true_for_standard_work_tree_repository(self):
+    def test_is_git_repository_returns_true_for_standard_work_tree_repository(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             repo_path = Path(tmpdir) / "repo"
             repo_path.mkdir(parents=True, exist_ok=True)
@@ -52,7 +52,7 @@ class GitManagerBehavior(unittest.TestCase):
 
             self.assertTrue(is_git_repository(repo_path))
 
-    def is_git_repository_returns_true_for_subdirectory_inside_work_tree(self):
+    def test_is_git_repository_returns_true_for_subdirectory_inside_work_tree(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             repo_path = Path(tmpdir) / "repo"
             nested_path = repo_path / "nested" / "path"
@@ -69,7 +69,7 @@ class GitManagerBehavior(unittest.TestCase):
 
             self.assertTrue(is_git_repository(nested_path))
 
-    def is_git_repository_returns_true_for_bare_repository(self):
+    def test_is_git_repository_returns_true_for_bare_repository(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             bare_repo_path = Path(tmpdir) / "bare.git"
 
@@ -84,19 +84,4 @@ class GitManagerBehavior(unittest.TestCase):
             self.assertTrue(is_git_repository(bare_repo_path))
 
 
-def load_tests(loader, tests, pattern):
-    suite = unittest.TestSuite()
-    method_names = [
-        "run_git_command_returns_completed_process_for_valid_git_command",
-        "run_git_command_captures_non_zero_exit_for_invalid_git_command",
-        "is_git_repository_returns_false_for_missing_path",
-        "is_git_repository_returns_false_for_regular_file_path",
-        "is_git_repository_returns_false_for_directory_that_is_not_a_repo",
-        "is_git_repository_returns_true_for_standard_work_tree_repository",
-        "is_git_repository_returns_true_for_subdirectory_inside_work_tree",
-        "is_git_repository_returns_true_for_bare_repository",
-    ]
-    for method_name in method_names:
-        suite.addTest(GitManagerBehavior(method_name))
-    return suite
 
