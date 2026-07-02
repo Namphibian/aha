@@ -3,7 +3,7 @@ from rich.syntax import Syntax
 from rich.table import Table
 
 from aha.library.catalog.manager import (
-    list_values,
+    list_value_files,
     get_values_data,
 )
 from aha.library.catalog.exceptions import (
@@ -16,7 +16,7 @@ from aha.ui.console_exception_helper import exit_catalog_not_initialised
 
 def _list_values_or_exit() -> list[str]:
     try:
-        return list_values()
+        return list_value_files()
     except AhaCatalogNotInitialisedException:
         exit_catalog_not_initialised()
 

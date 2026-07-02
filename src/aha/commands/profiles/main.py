@@ -3,8 +3,9 @@ from rich.syntax import Syntax
 from rich.table import Table
 
 from aha.library.catalog.manager import (
-    get_profile_data,
-    list_profiles,
+    get_profile_data_for_profile_file,
+    list_profile_files,
+    prepare_profile_data_map,
 )
 from aha.library.catalog.exceptions import (
     AhaCatalogNotInitialisedException,
@@ -42,7 +43,7 @@ def get(ctx, profile: str):
     """Get and displays profile record details"""
 
     try:
-        profile_str, _ = get_profile_data(profile)
+        profile_str, _ = get_profile_data_for_profile_file(profile)
     except AhaCatalogNotInitialisedException:
         exit_catalog_not_initialised()
     except AhaCatalogDataException as exc:
@@ -57,36 +58,32 @@ def get(ctx, profile: str):
 @click.pass_context
 def list_registered_profiles(ctx):
     """List all registered profiles."""
-    profiles_listed: list[str] = []
     try:
-        profiles_listed = list_profiles()
-
-        profile_data_map = {}
-        if not profiles_listed:
-            console.print("[warning]No profiles found.[/warning]")
-            return
-
-        for profile in profiles_listed:
-            _, profile_data_map[profile] = get_profile_data(profile)
+        profile_data_map = prepare_profile_data_map()
     except AhaCatalogNotInitialisedException:
         exit_catalog_not_initialised()
     except AhaCatalogDataException as exc:
         console.print(f"[error]{exc}[/error]")
         raise click.exceptions.Exit(2)
+    except Exception as exc:
+        console.print(f"[error]{exc}[/error]")
+        raise click.exceptions.Exit(2)
 
     table = Table(title="Registered Profiles")
+    table.add_column("File Name", style="path")
     table.add_column("Name", justify="left", style="key", no_wrap=True)
     table.add_column("Description", style="value")
     table.add_column("Mandatory Resource #", justify="right", style="info")
     table.add_column("Optional Resource #", justify="right", style="subtle")
-    table.add_column("File Name", style="path")
+
 
     for k, v in profile_data_map.items():
         table.add_row(
+            k,
             v["name"],
             v["description"],
             str(len(v[TEMPLATE_KEY]["mandatory"])),
             str(len(v[TEMPLATE_KEY]["optional"])),
-            k,
+
         )
     console.print(table)

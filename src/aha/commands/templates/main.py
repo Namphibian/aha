@@ -4,7 +4,7 @@ from rich.table import Table
 
 from aha.library.catalog.manager import (
     get_template_data,
-    list_templates,
+    list_template_files,
 )
 from aha.library.catalog.exceptions import (
     AhaCatalogNotInitialisedException,
@@ -16,7 +16,7 @@ from aha.ui.console_exception_helper import exit_catalog_not_initialised
 
 def _list_templates_or_exit() -> list[str]:
     try:
-        return list_templates()
+        return list_template_files()
     except AhaCatalogNotInitialisedException:
         exit_catalog_not_initialised()
 

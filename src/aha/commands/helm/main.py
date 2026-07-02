@@ -10,7 +10,7 @@ from aha.library.catalog.exceptions import (
 )
 from aha.library.catalog.manager import (
     get_helper_data,
-    get_profile_data,
+    get_profile_data_for_profile_file,
     get_template_data,
     get_values_data,
 )
@@ -45,7 +45,7 @@ def generate(ctx):
 def chart(ctx, name: str, profile: str, output_path: Path):
     """Generate a Helm chart"""
     try:
-        _, profile_data = get_profile_data(profile)
+        _, profile_data = get_profile_data_for_profile_file(profile)
         profile_name = profile_data.get("name", profile)
         console.print(f"[info]Generating Helm chart for profile {profile_name}[/info]")
         console.print(f"[info]Chart name: {name}[/info]")

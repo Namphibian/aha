@@ -19,3 +19,4 @@ class AhaCatalogInvalidFileTypeException(AhaCatalogDataException):
 
 class AhaCatalogFileNotFoundException(AhaCatalogDataException):
     """Raised when a requested catalog file is not found."""
+

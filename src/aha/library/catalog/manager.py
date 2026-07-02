@@ -221,38 +221,47 @@ def _catalog_file_path(
     return catalog_directory.joinpath(f"{name}{default_suffix}")
 
 
-def list_profiles() -> list[str]:
+def list_profile_files() -> list[str]:
     return _list_catalog_files(PROFILE_KEY, PROFILE_SUFFIXES)
 
 
-def list_templates() -> list[str]:
+def list_template_files() -> list[str]:
     return _list_catalog_files(TEMPLATE_KEY, TEMPLATE_SUFFIXES)
 
 
-def list_values() -> list[str]:
+def list_value_files() -> list[str]:
     return _list_catalog_files(VALUES_KEY, VALUES_SUFFIXES)
 
 
 def list_helpers() -> list[str]:
     return _list_catalog_files(HELPERS_KEY, HELPER_SUFFIXES)
 
+def prepare_profile_data_map()-> dict[str,Any]:
 
-def get_profile_data(profile_name: str) -> tuple[str, dict]:
+    profiles_listed: list[str] = list_profile_files()
+    profile_data_map = {}
+    if len(profiles_listed) > 0:
+        for profile in profiles_listed:
+            _, profile_data_map[profile] = get_profile_data_for_profile_file(profile)
+    return profile_data_map
+    
+
+def get_profile_data_for_profile_file(profile_file_name: str) -> tuple[str, dict]:
     profile_path = _catalog_file_path(
         directory=PROFILE_KEY,
-        name=profile_name,
+        name=profile_file_name,
         allowed_suffixes=PROFILE_SUFFIXES,
         default_suffix=".yaml",
     )
 
     if profile_path.suffix.lower() not in PROFILE_SUFFIXES:
         raise AhaCatalogInvalidFileTypeException(
-            f"Profile '{profile_name}' must be a YAML file."
+            f"Profile '{profile_file_name}' must be a YAML file."
         )
 
     if not profile_path.is_file():
         raise AhaCatalogFileNotFoundException(
-            f"Profile '{profile_name}' was not found."
+            f"Profile '{profile_file_name}' was not found."
         )
 
     yaml_str: str = profile_path.read_text(encoding="utf-8")
