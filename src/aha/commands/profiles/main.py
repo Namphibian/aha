@@ -71,8 +71,7 @@ def list_registered_profiles(ctx):
 
     table = Table(title="Registered Profiles")
     table.add_column("File Name", style="path")
-    table.add_column("Name", justify="left", style="key", no_wrap=True)
-    table.add_column("Description", style="value")
+    table.add_column("Chart description", style="value")
     table.add_column("Mandatory Resource #", justify="right", style="info")
     table.add_column("Optional Resource #", justify="right", style="subtle")
 
@@ -80,7 +79,6 @@ def list_registered_profiles(ctx):
     for k, v in profile_data_map.items():
         table.add_row(
             k,
-            v["name"],
             v["description"],
             str(len(v[TEMPLATE_KEY]["mandatory"])),
             str(len(v[TEMPLATE_KEY]["optional"])),
